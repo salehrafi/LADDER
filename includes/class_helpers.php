@@ -13,6 +13,8 @@
  * classes and results for that student.
  */
 
+require_once __DIR__ . '/spreadsheet.php';
+
 const SECTION_NAME_MAX = 80;
 
 // ---- Default passwords ---------------------------------------------------------
@@ -425,23 +427,25 @@ function remove_student(mysqli $conn, string $teacher_email, string $student_ema
 // ---- Importing students ------------------------------------------------------------
 
 /**
- * Parse an uploaded CSV of students. The header row names the columns in any
- * order: name, email, id (or "student id"), section. Without a header the
- * order name, email, id, section is assumed. Excel's UTF-8 BOM and
- * semicolon-separated files are accepted.
+ * Parse an uploaded student list: an Excel workbook (.xlsx) or CSV/text in any
+ * encoding, separated by commas, semicolons or tabs (see includes/spreadsheet.php).
+ * The header row names the columns in any order: name, email, id (or
+ * "student id"), section. Without a header the order name, email, id, section
+ * is assumed.
  *
  * @return array{rows: array<int,array{line:int,name:string,email:string,id:string,section:string}>, errors: string[]}
  */
 function parse_student_csv(string $content): array
 {
-    $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
-    $content = str_replace(["\r\n", "\r"], "\n", $content);
-    $lines = array_values(array_filter(explode("\n", $content), fn($l) => trim($l) !== ''));
-    if (!$lines) {
+    $sheet = read_spreadsheet($content);
+    if ($sheet['error'] !== null) {
+        return ['rows' => [], 'errors' => [$sheet['error']]];
+    }
+    $table = $sheet['rows'];
+    if (!$table) {
         return ['rows' => [], 'errors' => ['The file is empty.']];
     }
 
-    $delimiter = substr_count($lines[0], ';') > substr_count($lines[0], ',') ? ';' : ',';
     $aliases = [
         'name' => ['name', 'full name', 'full_name', 'student name'],
         'email' => ['email', 'e-mail', 'email address'],
@@ -449,7 +453,7 @@ function parse_student_csv(string $content): array
         'section' => ['section', 'class', 'section name'],
     ];
 
-    $first = array_map(fn($c) => mb_strtolower(trim($c)), str_getcsv($lines[0], $delimiter, '"', ''));
+    $first = array_map(fn($c) => mb_strtolower(trim((string) $c)), $table[0]);
     $map = [];
     foreach ($aliases as $field => $names) {
         foreach ($first as $i => $col) {
@@ -468,8 +472,7 @@ function parse_student_csv(string $content): array
     }
 
     $rows = [];
-    foreach (array_slice($lines, $has_header ? 1 : 0) as $i => $line) {
-        $cells = str_getcsv($line, $delimiter, '"', '');
+    foreach (array_slice($table, $has_header ? 1 : 0) as $i => $cells) {
         $get = fn($f) => isset($map[$f]) ? trim((string) ($cells[$map[$f]] ?? '')) : '';
         $rows[] = [
             'line' => $i + ($has_header ? 2 : 1),

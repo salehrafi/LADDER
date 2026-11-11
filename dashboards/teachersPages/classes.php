@@ -67,11 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $file = $_FILES['csv'] ?? null;
             $password = chosen_default_password($error);
             if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
-                $error = "Choose a CSV file to upload.";
+                $error = "Choose a CSV or Excel file to upload.";
             } elseif ($file['size'] > CSV_MAX_BYTES) {
                 $error = "The file is too large (max 1 MB).";
-            } elseif (!preg_match('/\.(csv|txt)$/i', (string) $file['name'])) {
-                $error = "Upload a .csv file (Excel: File > Save As > CSV UTF-8).";
+            } elseif (!preg_match('/\.(csv|tsv|txt|xlsx|xlsm|xls)$/i', (string) $file['name'])) {
+                $error = "Upload a CSV or Excel file (.csv, .xlsx, .xls, .txt).";
             } elseif ($password !== null) {
                 $parsed = parse_student_csv((string) file_get_contents($file['tmp_name']));
                 if ($parsed['errors']) {
@@ -256,9 +256,9 @@ $nav_base = '../';
 
         <div class="class-grid">
             <div class="card">
-                <h2>Import from CSV</h2>
+                <h2>Import from CSV or Excel</h2>
                 <p class="helptext">
-                    Columns: <code>name, email, id, section</code> (header row optional, any order).
+                    Columns: <code>name, email, id, section</code> (header row optional, any order). Excel workbooks (.xlsx) and any CSV or text export from Excel work.
                     New students get an account with the default password; existing students are just added to the section.
                     <a class="link" href="classes.php?sample=1">Download a sample CSV</a>
                 </p>
@@ -266,8 +266,8 @@ $nav_base = '../';
                     <input type="hidden" name="action" value="import_csv">
                     <?php if ($section): ?><input type="hidden" name="section_id" value="<?php echo (int) $section['id']; ?>"><?php endif; ?>
                     <div class="form-field">
-                        <label for="csv">CSV file</label>
-                        <input type="file" id="csv" name="csv" accept=".csv,text/csv" required>
+                        <label for="csv">CSV or Excel file</label>
+                        <input type="file" id="csv" name="csv" accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" required>
                     </div>
                     <?php if (!$section && $every_section): ?>
                         <div class="form-field">
