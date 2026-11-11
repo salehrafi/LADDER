@@ -51,7 +51,7 @@ auth_layout_start('Reset password', 'Forgot your password?', "Enter your account
                 <?php echo csrf_field(); ?>
                 <div class="field">
                     <label for="mailTo">Email</label>
-                    <input type="email" name="mailTo" id="mailTo" placeholder="you@school.edu" autocomplete="email" maxlength="100" required autofocus>
+                    <input type="email" name="mailTo" id="mailTo" placeholder="you@gmail.com" autocomplete="email" maxlength="100" required autofocus>
                 </div>
                 <?php echo auth_alert($error); ?>
                 <button type="submit" class="btn btn-primary btn-block">Send reset code</button>

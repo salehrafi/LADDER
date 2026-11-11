@@ -523,7 +523,7 @@ if (isset($_SESSION['logged_in'], $_SESSION['role'])) {
                     </ul>
                 </div>
 
-                <div class="stage reveal-stage" aria-hidden="true">
+                <!-- <div class="stage reveal-stage" aria-hidden="true">
                     <div class="app">
                         <div class="app-bar">
                             <div class="dots"><i></i><i></i><i></i></div>
@@ -604,7 +604,7 @@ if (isset($_SESSION['logged_in'], $_SESSION['role'])) {
                         <span class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
                         <div><b>Exam mode on</b><small>Ends in <span class="timer" id="timer">24:59</span></small></div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </section>
     </main>
