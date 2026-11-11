@@ -12,4 +12,4 @@
     </div>
 </nav>
 <?php echo render_toasts(); ?>
-<script src="<?php echo e($nav_base); ?>../assets/app.js" defer></script>
+<script src="<?php echo e($nav_base); ?>../assets/app.js?v=2" defer></script>

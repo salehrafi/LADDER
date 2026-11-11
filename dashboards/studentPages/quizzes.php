@@ -43,7 +43,7 @@ $nav_base = '../';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../navStyle.css?v=9">
+    <link rel="stylesheet" href="../navStyle.css?v=10">
     <link rel="stylesheet" href="../appStyle.css?v=10">
     <title>Quizzes · LADDER</title>
 </head>

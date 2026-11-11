@@ -65,6 +65,7 @@ if (isset($_SESSION['logged_in'], $_SESSION['role'])) {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
+            position: relative; /* bounds the background layer to the page */
         }
 
         a { color: inherit; text-decoration: none; }
@@ -75,8 +76,8 @@ if (isset($_SESSION['logged_in'], $_SESSION['role'])) {
         /* ---------- Background ---------- */
         .backdrop {
             position: absolute;
-            inset: 0 0 auto 0;
-            height: 980px;
+            inset: 0; /* never taller than the page, so no empty scroll */
+            max-height: 980px;
             overflow: hidden;
             pointer-events: none;
             z-index: 0;
@@ -431,7 +432,7 @@ if (isset($_SESSION['logged_in'], $_SESSION['role'])) {
             .stage { max-width: 640px; width: 100%; margin: 0 auto; }
             .app { transform: none; }
             .stage:hover .app { transform: none; }
-            .backdrop { height: 1400px; }
+            .backdrop { max-height: 1400px; }
         }
 
         @media (max-width: 600px) {

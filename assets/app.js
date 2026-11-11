@@ -17,11 +17,21 @@
     const sidebar = document.getElementById('app-sidebar');
     const burger = sidebar && sidebar.querySelector('.nav-burger');
     if (burger) {
-        burger.addEventListener('click', () => {
-            const open = sidebar.classList.toggle('is-open');
+        const setMenu = open => {
+            sidebar.classList.toggle('is-open', open);
+            document.documentElement.classList.toggle('nav-open', open); // stops the page scrolling behind the menu
             burger.setAttribute('aria-expanded', open ? 'true' : 'false');
             burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        };
+        burger.addEventListener('click', () => setMenu(!sidebar.classList.contains('is-open')));
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                setMenu(false);
+                burger.focus();
+            }
         });
+        // Widening past the mobile layout closes the menu and unlocks scrolling.
+        window.matchMedia('(min-width: 1025px)').addEventListener('change', e => e.matches && setMenu(false));
     }
 
     // ---- Toasts ------------------------------------------------------------------

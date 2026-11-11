@@ -192,5 +192,20 @@ body.quiz-page .app-sidebar ~ .quiz-bar { margin-left: 0; }
         max-height: calc(100vh - 56px);
         border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
+
+    /* Open menu: a full-screen panel under the top bar, so the page does not
+       show through below it; the page behind it does not scroll. */
+    html.js .app-sidebar.is-open .sidebar-body {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        max-height: none;
+        background: var(--navy, #142B4A);
+        overscroll-behavior: contain;
+    }
+    html.nav-open,
+    html.nav-open body { overflow: hidden; }
     .navBar li a { padding: 12px 18px; }
 }
