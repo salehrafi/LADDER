@@ -143,7 +143,7 @@ function issue_password_reset_code(mysqli $conn, string $email): ?string
     $code = (string) random_int(100000, 999999);
     $hash = password_hash($code, PASSWORD_DEFAULT);
     $expires = date('Y-m-d H:i:s', time() + OTP_LIFETIME_MINUTES * 60);
-    $stmt = $conn->prepare("UPDATE reg_info SET otp = ?, exp_time = ?, otp_attempts = 0 WHERE email = ? AND pass <> '' AND is_demo = 0");
+    $stmt = $conn->prepare("UPDATE reg_info SET otp = ?, exp_time = ?, otp_attempts = 0 WHERE email = ? AND pass <> ''");
     $stmt->bind_param("sss", $hash, $expires, $email);
     $stmt->execute();
     $issued = $stmt->affected_rows === 1;
@@ -320,57 +320,6 @@ function student_id_error(string $id): ?string
         return 'Student ID cannot start with TCH- (reserved for teachers).';
     }
     return null;
-}
-
-// ---- Demo accounts ---------------------------------------------------------------
-
-// Public logins for exploring the app; their password is shown on the sign-in
-// page. It is shorter than the password rule on purpose and only set here.
-const DEMO_PASSWORD = '1234';
-const DEMO_TEACHER_EMAIL = 'teacher@gmail.com';
-const DEMO_STUDENT_EMAIL = 'student@gmail.com';
-const DEMO_SECTION = 'Demo Class';
-
-/**
- * Create the demo teacher and student (if missing), flag them is_demo, and
- * enrol the student in the teacher's demo section. Safe to run repeatedly.
- */
-function ensure_demo_accounts(mysqli $conn): void
-{
-    $hash = password_hash(DEMO_PASSWORD, PASSWORD_DEFAULT);
-    $accounts = [
-        [DEMO_TEACHER_EMAIL, 'teacher', 'Demo Teacher', 'TCH-DEMO'],
-        [DEMO_STUDENT_EMAIL, 'student', 'Demo Student', 'DEMO-STUDENT'],
-    ];
-    $insert = $conn->prepare(
-        "INSERT IGNORE INTO reg_info (id, full_name, email, pass, role, email_verified, is_demo) VALUES (?, ?, ?, ?, ?, 1, 1)"
-    );
-    foreach ($accounts as [$email, $role, $name, $id]) {
-        $insert->bind_param("sssss", $id, $name, $email, $hash, $role);
-        $insert->execute();
-    }
-    $insert->close();
-
-    $teacher = DEMO_TEACHER_EMAIL;
-    $section = DEMO_SECTION;
-    $student = DEMO_STUDENT_EMAIL;
-    $stmt = $conn->prepare("INSERT IGNORE INTO sections (teacher_email, name) VALUES (?, ?)");
-    $stmt->bind_param("ss", $teacher, $section);
-    $stmt->execute();
-    $stmt->close();
-    $stmt = $conn->prepare(
-        "INSERT IGNORE INTO section_students (section_id, student_email)
-         SELECT id, ? FROM sections WHERE teacher_email = ? AND name = ?"
-    );
-    $stmt->bind_param("sss", $student, $teacher, $section);
-    $stmt->execute();
-    $stmt->close();
-}
-
-/** Is the signed-in user one of the shared demo accounts? */
-function is_demo_session(): bool
-{
-    return !empty($_SESSION['is_demo']);
 }
 
 // ---- Account sessions ----------------------------------------------------------
@@ -629,7 +578,6 @@ function login_user(array $user): void
     $_SESSION['logged_in'] = true;
     $_SESSION['must_change_password'] = !empty($user['must_change_password']);
     $_SESSION['auth_version'] = (int) ($user['auth_version'] ?? 0);
-    $_SESSION['is_demo'] = !empty($user['is_demo']);
     $_SESSION['last_seen'] = time();
     unset($_SESSION['csrf_token']);
 }

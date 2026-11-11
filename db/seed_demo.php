@@ -8,9 +8,7 @@
  * Everything it creates uses @demo.test addresses, so it never touches real
  * accounts. Do not run this against a live site with real student data.
  *
- * Demo logins (shown on the sign-in page): teacher@gmail.com and student@gmail.com,
- * password 1234. Classmates student02..12@demo.test use Demo@1234.
- * Re-run this any time to restore the demo class after visitors have used it.
+ * Logins: teacher@demo.test and student01..12@demo.test, password Demo@1234.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -18,13 +16,12 @@ if (PHP_SAPI !== 'cli') {
     exit("Run this from the command line: php db/seed_demo.php\n");
 }
 
-require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/conn.php';
 require_once __DIR__ . '/../includes/quiz_helpers.php';
 require_once __DIR__ . '/../includes/class_helpers.php';
 
-const CLASSMATE_PASSWORD = 'Demo@1234';
-const DEMO_TEACHER = DEMO_TEACHER_EMAIL;   // the public demo teacher (includes/helpers.php)
+const DEMO_PASSWORD = 'Demo@1234';
+const DEMO_TEACHER = 'teacher@demo.test';
 const DEMO_DOMAIN = '%@demo.test';
 
 $reset_only = in_array('--reset', $argv ?? [], true);
@@ -42,22 +39,7 @@ $conn->query("DELETE FROM subjects WHERE teacher_email LIKE '$demo'");
 $conn->query("DELETE FROM sections WHERE teacher_email LIKE '" . $conn->real_escape_string(DEMO_DOMAIN) . "'");
 $conn->query("DELETE FROM section_students WHERE student_email LIKE '" . $conn->real_escape_string(DEMO_DOMAIN) . "'");
 $conn->query("DELETE FROM reg_info WHERE email LIKE '" . $conn->real_escape_string(DEMO_DOMAIN) . "'");
-// The public demo accounts stay, but everything they created or took is reset.
-$dt = $conn->real_escape_string(DEMO_TEACHER_EMAIL);
-$ds = $conn->real_escape_string(DEMO_STUDENT_EMAIL);
-$conn->query("DELETE FROM quiz_attempts WHERE student_email = '$ds'");
-$conn->query("DELETE FROM quizzes WHERE teacher_email = '$dt'");
-$conn->query("DELETE FROM questions WHERE teacher_email = '$dt'");
-$conn->query("DELETE FROM subjects WHERE teacher_email = '$dt'");
-$conn->query("DELETE FROM sections WHERE teacher_email = '$dt'");
-$conn->query("DELETE FROM section_students WHERE student_email = '$ds'");
 $conn->commit();
-ensure_demo_accounts($conn);
-$demo_hash = password_hash(DEMO_PASSWORD, PASSWORD_DEFAULT);
-$reset = $conn->prepare("UPDATE reg_info SET pass = ?, must_change_password = 0, email_notifications = 0, auth_version = auth_version + 1 WHERE is_demo = 1");
-$reset->bind_param("s", $demo_hash);
-$reset->execute();
-$reset->close();
 
 if ($reset_only) {
     echo "Demo data removed.\n";
@@ -68,13 +50,19 @@ if ($reset_only) {
 $first_names = ['Rafi', 'Nusrat', 'Tanvir', 'Sadia', 'Imran', 'Farhana', 'Arif', 'Mim', 'Shuvo', 'Tasnim', 'Hasan', 'Riya'];
 $last_names = ['Ahmed', 'Khan', 'Hossain', 'Rahman', 'Islam', 'Chowdhury', 'Uddin', 'Sultana', 'Karim', 'Begum', 'Mia', 'Akter'];
 
-$hash = password_hash(CLASSMATE_PASSWORD, PASSWORD_DEFAULT);
+$hash = password_hash(DEMO_PASSWORD, PASSWORD_DEFAULT);
 
 $insert_user = $conn->prepare("INSERT INTO reg_info (id, full_name, email, pass, role) VALUES (?, ?, ?, ?, ?)");
 
-// The public demo student is the first of twelve; the rest are classmates.
-$students = [DEMO_STUDENT_EMAIL];
-for ($i = 1; $i < 12; $i++) {
+$teacher_role = 'teacher';
+$teacher_id = 'T1001';
+$teacher_name = 'Demo Teacher';
+$teacher_email = DEMO_TEACHER;
+$insert_user->bind_param("sssss", $teacher_id, $teacher_name, $teacher_email, $hash, $teacher_role);
+$insert_user->execute();
+
+$students = [];
+for ($i = 0; $i < 12; $i++) {
     $sid = 'S' . str_pad((string) (2001 + $i), 4, '0', STR_PAD_LEFT);
     $name = $first_names[$i] . ' ' . $last_names[$i];
     $email = sprintf('student%02d@demo.test', $i + 1);
@@ -278,7 +266,6 @@ $draft = json_encode(["q_$first_q" => (string) $conn->query("SELECT id FROM ques
 $conn->query("UPDATE quiz_attempts SET draft_answers = '" . $conn->real_escape_string($draft) . "' WHERE id = $resume_attempt_id");
 
 echo "Demo data created.\n";
-echo "  Teacher login:  " . DEMO_TEACHER_EMAIL . "  /  " . DEMO_PASSWORD . "\n";
-echo "  Student login:  " . DEMO_STUDENT_EMAIL . "  /  " . DEMO_PASSWORD . "\n";
-echo "  Classmates:     student02@demo.test ... student12@demo.test  /  " . CLASSMATE_PASSWORD . "\n";
+echo "  Teacher login:  " . DEMO_TEACHER . "  /  " . DEMO_PASSWORD . "\n";
+echo "  Student logins: student01@demo.test ... student12@demo.test  /  " . DEMO_PASSWORD . "\n";
 echo "  Quizzes: 2 published (1 MCQ, 1 short answer needing grading), 1 draft.\n";

@@ -49,7 +49,7 @@ if (!$quiz_id) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../navStyle.css?v=9">
-        <link rel="stylesheet" href="../appStyle.css?v=9">
+        <link rel="stylesheet" href="../appStyle.css?v=10">
         <title>Results</title>
     </head>
     <body>
@@ -188,7 +188,7 @@ unset($s);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../navStyle.css?v=9">
-    <link rel="stylesheet" href="../appStyle.css?v=9">
+    <link rel="stylesheet" href="../appStyle.css?v=10">
     <title>Results - <?php echo e($quiz['title']); ?></title>
 </head>
 <body>

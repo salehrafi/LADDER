@@ -298,13 +298,6 @@ input:focus { outline: none; border-color: var(--indigo); box-shadow: 0 0 0 4px 
 
 .resend-row { margin-top: 10px; }
 
-/* Demo accounts */
-.demo { margin-top: 22px; }
-.demo-label { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
-.demo-label::before, .demo-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-.demo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.demo-row .btn { height: 42px; font-size: 14px; }
-.demo-creds { margin: 10px 0 0; text-align: center; font-size: 12px; color: var(--muted); word-break: break-word; }
 .switch { margin: 22px 0 0; text-align: center; font-size: 14px; color: var(--text-2); }
 
 /* Alerts */

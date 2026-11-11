@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         if (throttle_blocked($conn, 'login_email', $email) || throttle_blocked($conn, 'login_ip', $ip)) {
             $signin_error = "Too many failed sign-in attempts. Wait 15 minutes and try again, or reset your password.";
         } else {
-            $stmt = $conn->prepare("SELECT full_name, email, pass, role, must_change_password, auth_version, email_verified, is_demo FROM reg_info WHERE email = ? LIMIT 1");
+            $stmt = $conn->prepare("SELECT full_name, email, pass, role, must_change_password, auth_version, email_verified FROM reg_info WHERE email = ? LIMIT 1");
             $stmt->bind_param("s", $email);
             $stmt->execute();
             $user = $stmt->get_result()->fetch_assoc();
@@ -217,7 +217,7 @@ $ladder = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="auth.css?v=4">
+    <link rel="stylesheet" href="auth.css?v=5">
 </head>
 
 <body>
@@ -312,22 +312,6 @@ $ladder = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"
                                 <button type="submit" class="btn btn-ghost btn-block">Send a new verification link</button>
                             </form>
                         <?php endif; ?>
-
-                        <div class="demo">
-                            <p class="demo-label"><span>or explore without an account</span></p>
-                            <div class="demo-row">
-                                <?php foreach (['student' => DEMO_STUDENT_EMAIL, 'teacher' => DEMO_TEACHER_EMAIL] as $demo_role => $demo_email): ?>
-                                    <form method="POST" action="login.php">
-                                        <?php echo csrf_field(); ?>
-                                        <input type="hidden" name="action" value="login">
-                                        <input type="hidden" name="email" value="<?php echo e($demo_email); ?>">
-                                        <input type="hidden" name="password" value="<?php echo e(DEMO_PASSWORD); ?>">
-                                        <button type="submit" class="btn btn-ghost btn-block">Demo <?php echo $demo_role; ?></button>
-                                    </form>
-                                <?php endforeach; ?>
-                            </div>
-                            <p class="demo-creds"><?php echo e(DEMO_STUDENT_EMAIL); ?> &middot; <?php echo e(DEMO_TEACHER_EMAIL); ?> &middot; password <?php echo e(DEMO_PASSWORD); ?></p>
-                        </div>
 
                         <p class="switch">New to LADDER? <a href="login.php?mode=signup" data-mode="signup">Create an account</a></p>
                     </section>

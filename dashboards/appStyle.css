@@ -145,6 +145,7 @@ code {
 .app-sidebar ~ .container > *,
 .app-sidebar ~ .page-shell > * {
     max-width: 1180px;
+    margin-inline: auto; /* centre the content in the space beside the sidebar */
 }
 
 .page-header {
@@ -928,7 +929,7 @@ body.quiz-page { background: var(--bg); }
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    margin-bottom: 10px;
+    margin: 0 auto 10px;
     max-width: 1180px;
 }
 
@@ -958,6 +959,7 @@ body.quiz-page { background: var(--bg); }
     flex-wrap: wrap;
     gap: 6px;
     max-width: 1180px;
+    margin-inline: auto;
 }
 
 .q-palette a {

@@ -16,10 +16,7 @@ $error = "";
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $form = $_POST['form'] ?? '';
 
-    if (is_demo_session()) {
-        // Shared by every visitor: keep the login working for the next one.
-        $error = "This is a shared demo account, so its settings can't be changed. Create your own account to personalise it.";
-    } elseif ($form === 'profile') {
+    if ($form === 'profile') {
         $new_name = trim($_POST['full_name'] ?? '');
         if ($new_name === '') {
             $error = "Name cannot be empty.";
@@ -87,7 +84,7 @@ $nav_base = '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="navStyle.css?v=9">
-    <link rel="stylesheet" href="appStyle.css?v=9">
+    <link rel="stylesheet" href="appStyle.css?v=10">
     <title>Account Settings</title>
 </head>
 
